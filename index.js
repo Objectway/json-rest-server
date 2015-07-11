@@ -31,8 +31,10 @@ var rmRoute = function(pageUrl){
 }
 
 var serveRoute = function(request, response){
-	var httpStatus = 200;
-	var filePath = resources[request.url];
+	var httpStatus = 200
+	  , filePath = resources[request.url]
+	  ;
+
 	if(request.method == 'GET' && filePath){
 		fs.readFile(filePath, function (err, data) {
 		    if(err) {        
@@ -155,8 +157,13 @@ walk(entryPoint,  function(err) {
 	console.log('\nLoading complete. '.green + 'Now in watch on '.grey + entryPoint.cyan);
 });
 
-http.createServer(function (req, res) {
-  //dispatcher.dispatch(req, res);
-  serveRoute(req, res);
+http.createServer(function (request, response) {
+	if(request.url.match(/\/$/)){
+		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 302'.red);
+		response.writeHead(302, { 'Location': serverUrl + request.url.replace(/\/$/, '') });
+		response.end();	
+		return;
+	}
+  	serveRoute(request, response);
 })
 .listen(serverPort, serverDomain);
