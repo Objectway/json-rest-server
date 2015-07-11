@@ -31,6 +31,12 @@ var rmRoute = function(pageUrl){
 }
 
 var serveRoute = function(request, response){
+	if(request.url.match(/.+\/$/)){
+		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 302'.red);
+		response.writeHead(302, { 'Location': serverUrl + request.url.replace(/\/$/, '') });
+		response.end();	
+		return;
+	}
 	var httpStatus = 200
 	  , filePath = resources[request.url]
 	  ;
@@ -158,12 +164,6 @@ walk(entryPoint,  function(err) {
 });
 
 http.createServer(function (request, response) {
-	if(request.url.match(/\/$/)){
-		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 302'.red);
-		response.writeHead(302, { 'Location': serverUrl + request.url.replace(/\/$/, '') });
-		response.end();	
-		return;
-	}
   	serveRoute(request, response);
 })
 .listen(serverPort, serverDomain);
