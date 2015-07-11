@@ -50,6 +50,45 @@ var serveRoute = function(request, response){
 	    	response.end();
 	    	return;
 		});
+	}else if(request.method == 'POST'){
+		request.on('data', function(chunk) {
+	      	var dirContainer = entryPoint + request.url;
+			var fileContent = '' + chunk.toString()
+			try {
+		        fileContent = JSON.parse(fileContent);
+		    } catch (e) {
+				httpStatus = 400;
+				console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
+				response.writeHead(httpStatus, {"Content-Type": "text/plain"});
+			  	response.write("400 Bad request\n");
+			  	response.end();
+			  	return;
+		    }
+			fs.readdir(dirContainer, function(err, files){
+				var id = files.length;
+				do{
+					fileContent.id = id;
+					filePath = dirContainer + '/' + id++ + fileExtension
+				}while(fs.existsSync(filePath))
+				fs.writeFile(filePath, fileContent, function(err) {
+			    	if(err) {
+    			    	httpStatus = 500;
+				  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
+				        response.writeHead(httpStatus, {"Content-Type": "text/plain"});
+				        response.write(err + "\n");
+				        response.end();
+				        return;
+			    	}
+			      	httpStatus = 200
+				  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().green);
+			    	response.writeHead(httpStatus, {'Content-Type': 'application/json'});
+			    	response.write(JSON.stringify(fileContent));
+			    	response.end();
+			    	return;
+				});
+			})
+	    });
+		
 	}else{
 		httpStatus = 404;
 		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
