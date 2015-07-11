@@ -50,7 +50,7 @@ var serveRoute = function(request, response){
 	    	response.end();
 	    	return;
 		});
-	}else if(request.method == 'POST'){
+	}else if(request.method == 'POST' || (request.method == 'PUT' && filePath)){
 		request.on('data', function(chunk) {
 	      	var dirContainer = entryPoint + request.url
 			  , jsonContent
@@ -66,11 +66,13 @@ var serveRoute = function(request, response){
 			  	return;
 		    }
 			fs.readdir(dirContainer, function(err, files){
-				var id = files.length;
-				do{
-					jsonContent.id = id;
-					filePath = dirContainer + '/' + id++ + fileExtension
-				}while(fs.existsSync(filePath))
+				if(request.method == 'POST'){
+					var id = files.length;
+					do{
+						jsonContent.id = id;
+						filePath = dirContainer + '/' + id++ + fileExtension
+					}while(fs.existsSync(filePath))	
+				}
 				var fileContent = JSON.stringify(jsonContent)
 				fs.writeFile(filePath, fileContent, function(err) {
 			    	if(err) {
