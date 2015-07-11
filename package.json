@@ -1,0 +1,22 @@
+{
+  "name": "api-server",
+  "version": "1.0.0",
+  "description": "An API server that reads a specific folder, takes all json files and exposes all of them via API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "json",
+    "api",
+    "server",
+    "file"
+  ],
+  "author": "Michele Di Salvatore",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "httpdispatcher": "^0.4.0",
+    "walk": "^2.3.9"
+  }
+}
