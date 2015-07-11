@@ -3,8 +3,6 @@
 var fs      	= require('fs')
   , http 		= require('http')
   , path 		= require('path')
-  //, _ 			= require('lodash')
-  , dispatcher 	= require('httpdispatcher')
   , colors 		= require('colors')
   , watch		= require('watch')
   ;

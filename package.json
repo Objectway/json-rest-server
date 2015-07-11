@@ -16,8 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "httpdispatcher": "^0.4.0",
-    "walk": "^2.3.9",
     "watch": "^0.16.0"
   }
 }
