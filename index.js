@@ -6,6 +6,7 @@ var fs      	= require('fs')
   //, _ 			= require('lodash')
   , dispatcher 	= require('httpdispatcher')
   , colors 		= require('colors')
+  , watch		= require('watch')
   ;
 
 var entryPoint		= path.resolve(process.argv[2])
@@ -14,20 +15,49 @@ var entryPoint		= path.resolve(process.argv[2])
   , serverUrl		= 'http://' + serverDomain + ':' + serverPort
   , currentDir 		= ''
   , fileExtension	= '.json'
+  , resources		= {}
   ;
 
 
 
 var addRoute = function(pageUrl, filePath){
-	console.log("\n\tGET ".green + (serverUrl + pageUrl).cyan);
-  	dispatcher.onGet(pageUrl, function(req, res) {
-	    fs.readFile(filePath, function (err, data) {
-		  	if (err) throw err;
-		  	console.log("\n\t GET " + serverUrl + pageUrl);
-	    	res.writeHead(200, {'Content-Type': 'application/json'});
-	    	res.end(data.toString());
+	resources[pageUrl] = filePath;
+	console.log(" + ".green + (serverUrl + pageUrl).cyan);
+}
+
+var rmRoute = function(pageUrl){
+	delete resources[pageUrl];
+	console.log(" - ".red + (serverUrl + pageUrl).cyan);
+}
+
+var serveRoute = function(request, response){
+	var httpStatus = 200;
+	var filePath = resources[request.url];
+	if(request.method == 'GET' && filePath){
+		fs.readFile(filePath, function (err, data) {
+		    if(err) {        
+		    	httpStatus = 500;
+		  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
+		        response.writeHead(httpStatus, {"Content-Type": "text/plain"});
+		        response.write(err + "\n");
+		        response.end();
+		        return;
+	      	}
+	      	httpStatus = 200
+		  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().green);
+	    	response.writeHead(httpStatus, {'Content-Type': 'application/json'});
+	    	response.write(data.toString());
+	    	response.end();
+	    	return;
 		});
-	});
+	}else{
+		httpStatus = 404;
+		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
+		response.writeHead(httpStatus, {"Content-Type": "text/plain"});
+	  	response.write("404 Not Found\n");
+	  	response.end();
+	  	return;
+	}
 }
 
 var walk = function(dir, done) {
@@ -61,6 +91,17 @@ var walk = function(dir, done) {
   });
 };
 
+watch.watchTree(entryPoint, function (f, curr, prev) {
+  	var pageUrl = f.toString().replace(entryPoint, '').replace(fileExtension, '');
+  	if(typeof f !== "object" && path.extname(f) == fileExtension){
+  		if (prev === null) {
+      		addRoute(pageUrl, f);
+  	    } else if (curr.nlink === 0) {
+    		rmRoute(pageUrl);
+  	    }
+  	}
+  });
+
 console.log('\nServer running at '.grey + serverUrl.cyan);
 
 console.log('\nLoading directory '.grey + entryPoint.cyan);
@@ -68,11 +109,11 @@ console.log('\nLoading directory '.grey + entryPoint.cyan);
 walk(entryPoint,  function(err) {
   	if (err) throw err;
 	
-	console.log('\nAll available resourses are loaded'.green);
-	console.log('\nRequests: '.gray);
+	console.log('\nLoading complete. '.green + 'Now in watch on '.grey + entryPoint.cyan);
 });
 
 http.createServer(function (req, res) {
-  dispatcher.dispatch(req, res);
+  //dispatcher.dispatch(req, res);
+  serveRoute(req, res);
 })
 .listen(serverPort, serverDomain);
