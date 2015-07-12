@@ -44,3 +44,6 @@ PUT    /posts/1				-> UPDATE content of myapi/blog/posts/1.json
 PATCH  /posts/1				-> UPDATE partial content of myapi/blog/posts/1.json
 DELETE /posts/1				-> DELETE file myapi/blog/posts/1.json
 ```
+
+## Extras
+It's an alternative to npm json-server
