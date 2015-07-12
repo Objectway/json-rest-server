@@ -4,6 +4,7 @@ var fs      	= require('fs')
   , http 		= require('http')
   , path 		= require('path')
   , colors 		= require('colors')
+  , Q			= require('q')
   ;
 
 var entryPoint		= path.resolve(process.argv[2])
@@ -13,41 +14,91 @@ var entryPoint		= path.resolve(process.argv[2])
   , fileExtension	= '.json'
   ;
 
-http.createServer(function (request, response) {
-	/*
-	Redirects all url that end with / to the same url without /
-	e.g. http://127.0.0.1:1337/posts/ -> http://127.0.0.1:1337/posts
-	*/
-  	if(request.url.match(/.+\/$/)){
-		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 302'.red);
-		response.writeHead(302, { 'Location': serverUrl + request.url.replace(/\/$/, '') });
-		response.end();	
-		return;
+var readFile = function(filePath){
+	var deferred = Q.defer();
+	fs.readFile(filePath, function (error, text) {
+	    if (error) {
+	        deferred.reject(new Error(error));
+	    } else {
+	        deferred.resolve(text);
+	    }
+	});
+	return deferred.promise;
+}
+
+var readDir = function(dirPath){
+	var deferred = Q.defer();
+	fs.readdir(dirPath, function(error, filesList){
+	    if (error) {
+	        deferred.reject(new Error(dirPath + ': ' + error));
+	    } else {
+	        deferred.resolve(filesList);
+	    }
+	})
+	return deferred.promise;
+}
+
+var readDirAndMergeContent = function(dirPath){
+	var deferred 	= Q.defer()
+	  , contentDir 	= []
+	  ;
+
+	readDir(dirPath)
+	.then(function(filesList){
+		filesList.forEach(function(file) { 
+			if(path.extname(file) == fileExtension){
+				var filePath = dirPath + '/' + file;
+				try{
+					contentDir.push(JSON.parse(fs.readFileSync(filePath)));
+				}catch(err){
+			        deferred.reject(new Error(filePath + ': ' + error));
+				}
+			}
+		})
+		deferred.resolve(JSON.stringify(contentDir));
+	})
+	.catch(function(error){
+		deferred.reject(new Error(error));
+	})
+	return deferred.promise;
+}
+
+
+var reply = function(request, response, status, header, content, filePath){
+	response.writeHead(status, header);
+	if(content){
+		response.write(content.toString());
 	}
+	response.end();
+	console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + (status > 299 ? status.toString().red : status.toString().green) + (filePath ? ' -> ' + filePath.cyan : ''));
+}
+
+http.createServer(function (request, response) {
 	var dirPath = entryPoint + request.url
 	  , filePath = dirPath + fileExtension
 	  ;
 
 	/*
+	Redirects all url that end with / to the same url without /
+	e.g. http://127.0.0.1:1337/posts/ -> http://127.0.0.1:1337/posts
+	*/
+  	if(request.url.match(/.+\/$/)){
+  		reply(request, response, 302, { 'Location': serverUrl + request.url.replace(/\/$/, '') });
+	}
+
+	/*
 	On GET method, checks if file exists 
 	e.g. http://127.0.0.1:1337/posts -> ~/posts.json
 	*/
-	if(request.method == 'GET' && fs.existsSync(filePath)) {
+	else if(request.method == 'GET' && fs.existsSync(filePath)) {
 
-		fs.readFile(filePath, function (err, data) {
-		    if(err) {        
-		  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 500'.red);
-		        response.writeHead(500, {"Content-Type": "text/plain"});
-		        response.write(err + "\n");
-		        response.end();
-		        return;
-	      	}
-		  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' 200'.green + ' -> ' + filePath.cyan);
-	    	response.writeHead(200, {'Content-Type': 'application/json'});
-	    	response.write(data.toString());
-	    	response.end();
-	    	return;
-		});
+		readFile(filePath)
+		.then(function(content){
+			reply(request, response, 200, {'Content-Type': 'application/json'}, content, filePath);
+		})
+		.catch(function(err){
+			reply(request, response, 500, {'Content-Type': 'text/plain'}, err + "\n", filePath);
+		})
 	}
 
 	/*
@@ -55,27 +106,12 @@ http.createServer(function (request, response) {
 	e.g. http://127.0.0.1:1337/posts -> ~/posts/
 	*/
 	else if(request.method == 'GET' && fs.existsSync(dirPath)) {
-		var contentDir = [];
-		fs.readdir(dirPath, function(err, files){
-			files.forEach(function(file) { 
-				if(path.extname(file) == fileExtension){
-					try{
-						contentDir.push(JSON.parse(fs.readFileSync(dirPath + '/' + file)));
-					}catch(err){
-				  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 500'.red);
-				        response.writeHead(500, {"Content-Type": "text/plain"});
-				        response.write(dirPath + '/' + file + ': ' + err + "\n");
-				        response.end();
-				        return;
-					}
-				}
-			})
-			if(!response.finished){
-			  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' 200'.green + ' -> ' + dirPath.cyan);
-		    	response.writeHead(200, {'Content-Type': 'application/json'});
-		    	response.write(JSON.stringify(contentDir));
-		    	response.end();
-			}
+		readDirAndMergeContent(dirPath)
+		.then(function(content){
+			reply(request, response, 200, {'Content-Type': 'application/json'}, content, dirPath);
+		})
+		.catch(function(err){
+			reply(request, response, 500, {'Content-Type': 'text/plain'}, dirPath + '/' + file + ': ' + err + "\n", dirPath);
 		})
 	}
 
@@ -94,12 +130,7 @@ http.createServer(function (request, response) {
 		    } 
 			// If not a valid JSON, return an error 400
 		    catch (e) {
-				httpStatus = 400;
-				console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
-				response.writeHead(httpStatus, {"Content-Type": "text/plain"});
-			  	response.write("400 Bad request\n");
-			  	response.end();
-			  	return;
+		    	reply(request, response, 400, {'Content-Type': 'text/plain'}, "400 Bad request\n");
 		    }
 
 		    // Read inside directory
@@ -115,26 +146,18 @@ http.createServer(function (request, response) {
 				}
 
 				// Prepare the JSON to be written in the file
-				var fileContent = JSON.stringify(jsonContent)
+				var content = JSON.stringify(jsonContent)
 
 				// Write or overwrite the content
-				fs.writeFile(filePath, fileContent, function(err) {
+				fs.writeFile(filePath, content, function(err) {
 
 					// If something goes wrong, it returns a 500 status error
 			    	if(err) {
-				  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 500'.red);
-				        response.writeHead(500, {"Content-Type": "text/plain"});
-				        response.write(filePath + ': ' + err + "\n");
-				        response.end();
-				        return;
+			    		reply(request, response, 500, {'Content-Type': 'text/plain'}, filePath + ': ' + err + "\n", filePath);
 			    	}
 
 			    	// If it is all done, it returns the updated content with a 200 http status
-				  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' 200'.green + ' -> ' + filePath.cyan);
-			    	response.writeHead(200, {'Content-Type': 'application/json'});
-			    	response.write(fileContent);
-			    	response.end();
-			    	return;
+			    	reply(request, response, 200, {'Content-Type': 'application/json'}, content, filePath);
 				});
 			})
 	    });
@@ -151,18 +174,11 @@ http.createServer(function (request, response) {
 
 			// If something goes wrong, it returns a 500 status error
 	    	if(err) {
-		  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 500'.red);
-		        response.writeHead(500, {"Content-Type": "text/plain"});
-		        response.write(filePath + ': ' + err + "\n");
-		        response.end();
-		        return;
+	    		reply(request, response, 500, {'Content-Type': 'text/plain'}, filePath + ': ' + err + "\n", filePath);
 	    	}
 
 	    	// If it is all done, it returns an empty content with a 200 http status
-		  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' 200'.green + ' -> ' + filePath.cyan);
-	    	response.writeHead(200, {'Content-Type': 'application/plain'});
-	    	response.end();
-	    	return;
+	    	reply(request, response, 200, {'Content-Type': 'text/plain'}, null, filePath);
 		});
 	}
 
@@ -170,11 +186,7 @@ http.createServer(function (request, response) {
 	No directory or file found 
 	*/
 	else {
-		console.log(" -> " + request.method + " " + serverUrl + request.url + ' 404'.red);
-		response.writeHead(httpStatus, {"Content-Type": "text/plain"});
-	  	response.write("404 Not Found\n");
-	  	response.end();
-	  	return;
+		reply(request, response, 404, {'Content-Type': 'text/plain'}, "404 Not Found\n");
 	}
 
 })

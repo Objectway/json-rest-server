@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
+    "q": "^1.4.1",
     "watch": "^0.16.0"
   }
 }
