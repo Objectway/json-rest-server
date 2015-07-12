@@ -12,11 +12,11 @@ myapi
 ├── blog/
 │   ├── posts/
 │   │	├── 1.json
-│	│	├── 1
-│	│	│	├── comments/
-│	│	│	│   ├── 1.json
-│   │	├── 2.json
-│   │	├── 3.json
+│   │   ├── 1
+│   │   │   ├── comments/
+│   │   │   │   ├── 1.json
+│   │   ├── 2.json
+│   │   ├── 3.json
 ├── app/
 │   ├── api/
 │   │   ├── users.json
