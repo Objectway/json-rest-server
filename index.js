@@ -20,7 +20,7 @@ var entryPoint		= path.resolve(process.argv[2])
 
 var addRoute = function(pageUrl, filePath){
 	resources[pageUrl] = filePath;
-	console.log(" + ".green + (serverUrl + pageUrl).cyan);
+	console.log(" + ".green + (serverUrl + pageUrl).cyan + " -> " + filePath.cyan);
 }
 
 var rmRoute = function(pageUrl){
@@ -124,14 +124,17 @@ var walk = function(dir, done) {
       file = path.resolve(dir, file);
       
       fs.stat(file, function(err, stat) {
+      	var pageUrl = file.replace(entryPoint, '').replace(fileExtension, '');
         if (stat && stat.isDirectory()) {
           walk(file, function(err, res) {
             if (!--pending) done(null);
           });
+          if(pageUrl && !resources[pageUrl]){
+          	addRoute(pageUrl, file);
+          }
         } else {
           if(path.extname(file) == fileExtension){
-          	var pageUrl = file.replace(entryPoint, '').replace(fileExtension, '');
-          	addRoute(pageUrl, file)
+          	addRoute(pageUrl, file);
           }
           if (!--pending) done(null);
         }
