@@ -18,8 +18,7 @@ myapi
 │   │   ├── 2.json
 │   │   ├── 3.json
 ├── app/
-│   ├── api/
-│   │   ├── users.json
+│   ├── users.json
 ```
 
 Start your server
@@ -36,13 +35,13 @@ But if you go to [http://localhost:3000/blog/posts/1/comments](), you'll get an 
 Like REST, you can have GET and POST on folders and GET, PUT and DELETE on json files. Based on previous example, you can have
 
 ```
-GET    /blog/posts 			-> ARRAY of json files conteined in myapi/blog/posts
-GET    /posts/1				-> JSON content of myapi/blog/posts/1.json
-GET    /posts/1/comments	-> ARRAY of json files conteined in myapi/blog/posts/1/comments
-POST   /posts				-> CREATE a new json file in myapi/blog/posts
-PUT    /posts/1				-> UPDATE content of myapi/blog/posts/1.json
-PATCH  /posts/1				-> UPDATE partial content of myapi/blog/posts/1.json
-DELETE /posts/1				-> DELETE file myapi/blog/posts/1.json
+GET    /blog/posts				-> ARRAY of json files conteined in myapi/blog/posts
+GET    /blog/posts/1			-> JSON content of myapi/blog/posts/1.json
+GET    /blog/posts/1/comments	-> ARRAY of json files conteined in myapi/blog/posts/1/comments
+POST   /blog/posts				-> CREATE a new json file in myapi/blog/posts
+PUT    /blog/posts/1			-> UPDATE content of myapi/blog/posts/1.json
+PATCH  /blog/posts/1			-> UPDATE partial content of myapi/blog/posts/1.json
+DELETE /blog/posts/1			-> DELETE file myapi/blog/posts/1.json
 ```
 
 ## Extras
