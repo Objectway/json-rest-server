@@ -25,8 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "q": "^1.4.1",
-    "watch": "^0.16.0"
+    "q": "^1.4.1"
   },
   "gitHead": "3827b19d8e8b724d27cf0420930fb8165d1fd241",
   "bugs": {
