@@ -2,14 +2,15 @@ module.exports = function(entryPoint){
   var fs      	= require('fs')
     , http 		= require('http')
     , path 		= require('path')
-    , colors 		= require('colors')
+    , colors 	= require('colors')
     , Q			= require('q')
     ;
 
-  var serverPort 		= 3000
+  var serverPort 	= 3000
     , serverDomain 	= '127.0.0.1'
     , serverUrl		= 'http://' + serverDomain + ':' + serverPort
     , fileExtension	= '.json'
+    , server
     ;
 
   var readFile = function(filePath){
@@ -70,7 +71,7 @@ module.exports = function(entryPoint){
     return deferred.promise;
   };
 
-  http.createServer(function (request, response) {
+  server = http.createServer(function (request, response) {
     var dirPath = entryPoint + request.url
       , filePath = dirPath + fileExtension
       ;
@@ -103,7 +104,6 @@ module.exports = function(entryPoint){
      e.g. http://127.0.0.1:1337/posts -> ~/posts/
      */
     else if(request.method == 'GET' && fs.existsSync(dirPath)) {
-      var contentDir 	= [];
       readDir(dirPath)
         .then(pushContentFiles)
         .then(function(content){
@@ -146,7 +146,7 @@ module.exports = function(entryPoint){
           }
 
           // Prepare the JSON to be written in the file
-          var content = JSON.stringify(jsonContent)
+          var content = JSON.stringify(jsonContent);
 
           // Write or overwrite the content
           fs.writeFile(filePath, content, function(err) {
@@ -189,8 +189,14 @@ module.exports = function(entryPoint){
       reply(request, response, 404, {'Content-Type': 'text/plain'}, "404 Not Found\n");
     }
 
-  })
-  .listen(serverPort, serverDomain);
+  });
 
-  console.log('\nServer running at '.grey + serverUrl.cyan);
+  try{
+    server.listen(serverPort, serverDomain);
+    console.log('\nServer running at '.grey + serverUrl.cyan);
+  }catch(err){}
+
+  server.on('error', function() {
+    console.error('\nUnable to run server at '.red + serverUrl.cyan);
+  })
 };
