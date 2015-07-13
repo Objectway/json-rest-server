@@ -1,8 +1,11 @@
 {
-  "name": "api-server",
-  "version": "1.0.0",
+  "name": "json-rest-server",
+  "version": "1.0.1",
   "description": "An API server that reads a specific folder, takes all json files and exposes all of them via API",
   "main": "main.js",
+  "bin": {
+    "json-rest-server": "./main.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,6 +16,10 @@
     "file"
   ],
   "author": "Michele Di Salvatore",
+  "repository" : { 
+      "type" : "git", 
+      "url" : "https://github.com/micheledisalvatore/json-rest-server.git"
+    },
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
