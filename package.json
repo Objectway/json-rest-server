@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/micheledisalvatore/json-rest-server.git"
+    "url": "git+https://github.com/Objectway/json-rest-server.git"
   },
   "license": "MIT",
   "dependencies": {
@@ -30,9 +30,9 @@
   },
   "gitHead": "3827b19d8e8b724d27cf0420930fb8165d1fd241",
   "bugs": {
-    "url": "https://github.com/micheledisalvatore/json-rest-server/issues"
+    "url": "https://github.com/Objectway/json-rest-server/issues"
   },
-  "homepage": "https://github.com/micheledisalvatore/json-rest-server#readme",
+  "homepage": "https://github.com/Objectway/json-rest-server#readme",
   "_id": "json-rest-server@1.0.2",
   "_shasum": "0ac7d511a2bc58368461188a52a7bef4a45025f1",
   "_from": "json-rest-server@*",
