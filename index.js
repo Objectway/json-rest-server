@@ -11,7 +11,6 @@ var entryPoint		= path.resolve(process.argv[2])
   , serverPort 		= 1337
   , serverDomain 	= '127.0.0.1'
   , serverUrl		= 'http://' + serverDomain + ':' + serverPort
-  , currentDir 		= ''
   , fileExtension	= '.json'
   , resources		= {}
   ;
@@ -40,21 +39,27 @@ var serveRoute = function(request, response){
 	  ;
 
 	if(request.method == 'GET' && filePath){
-		fs.readFile(filePath, function (err, data) {
-		    if(err) {        
-		    	httpStatus = 500;
-		  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
-		        response.writeHead(httpStatus, {"Content-Type": "text/plain"});
-		        response.write(err + "\n");
-		        response.end();
-		        return;
-	      	}
-	      	httpStatus = 200
-		  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().green);
-	    	response.writeHead(httpStatus, {'Content-Type': 'application/json'});
-	    	response.write(data.toString());
-	    	response.end();
-	    	return;
+		fs.stat(filePath, function(err, stat) {
+			if (stat && stat.isDirectory()) {
+
+			}else{
+				fs.readFile(filePath, function (err, data) {
+				    if(err) {        
+				    	httpStatus = 500;
+				  		console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().red);
+				        response.writeHead(httpStatus, {"Content-Type": "text/plain"});
+				        response.write(err + "\n");
+				        response.end();
+				        return;
+			      	}
+			      	httpStatus = 200
+				  	console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + httpStatus.toString().green);
+			    	response.writeHead(httpStatus, {'Content-Type': 'application/json'});
+			    	response.write(data.toString());
+			    	response.end();
+			    	return;
+				});
+			}
 		});
 	}else if(request.method == 'POST' || (request.method == 'PUT' && filePath)){
 		request.on('data', function(chunk) {
