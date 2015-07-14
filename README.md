@@ -2,7 +2,7 @@
 A simple json REST server that exposes all json files contained in a directory tree.
 
 ## Install
-npm install json-rest-server
+npm install -g json-rest-server
 
 ## Example
 Create a directory tree with sub directories and valid .json files like this:
@@ -40,7 +40,6 @@ GET    /blog/posts/1			-> JSON content of myapi/blog/posts/1.json
 GET    /blog/posts/1/comments	-> ARRAY of json files conteined in myapi/blog/posts/1/comments
 POST   /blog/posts				-> CREATE a new json file in myapi/blog/posts
 PUT    /blog/posts/1			-> UPDATE content of myapi/blog/posts/1.json
-PATCH  /blog/posts/1			-> UPDATE partial content of myapi/blog/posts/1.json
 DELETE /blog/posts/1			-> DELETE file myapi/blog/posts/1.json
 ```
 
