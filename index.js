@@ -2,11 +2,11 @@ module.exports = function(entryPoint){
   var fs      	= require('fs')
     , http 		= require('http')
     , path 		= require('path')
-    , colors 	= require('colors')
+    , colors 		= require('colors')
     , Q			= require('q')
     ;
 
-  var serverPort 	= 3000
+  var serverPort 		= 3000
     , serverDomain 	= '127.0.0.1'
     , serverUrl		= 'http://' + serverDomain + ':' + serverPort
     , fileExtension	= '.json'
@@ -197,6 +197,6 @@ module.exports = function(entryPoint){
   }catch(err){}
 
   server.on('error', function() {
-    console.error('\nUnable to run server at '.red + serverUrl.cyan);
-  })
+    console.error('\nServer closed on error.'.red);
+  });
 };
