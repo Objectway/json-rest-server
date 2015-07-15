@@ -40,6 +40,7 @@ GET    /blog/posts/1			-> JSON content of myapi/blog/posts/1.json
 GET    /blog/posts/1/comments	-> ARRAY of json files conteined in myapi/blog/posts/1/comments
 POST   /blog/posts				-> CREATE a new json file in myapi/blog/posts
 PUT    /blog/posts/1			-> UPDATE content of myapi/blog/posts/1.json
+PATCH  /blog/posts/1			-> UPDATE content of myapi/blog/posts/1.json merging with existing content
 DELETE /blog/posts/1			-> DELETE file myapi/blog/posts/1.json
 ```
 
