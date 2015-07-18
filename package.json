@@ -1,8 +1,8 @@
 {
   "name": "json-rest-server",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "An API server that reads a specific folder, takes all json files and exposes all of them via API",
-  "main": "main.js",
+  "main": "index.js",
   "bin": {
     "json-rest-server": "./main.js"
   },
@@ -15,15 +15,43 @@
     "server",
     "file"
   ],
-  "author": "Michele Di Salvatore",
+  "author": {
+    "name": "Michele Di Salvatore"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/micheledisalvatore/json-rest-server.git"
+    "url": "git+https://github.com/Objectway/json-rest-server.git"
   },
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "q": "^1.4.1",
-    "watch": "^0.16.0"
-  }
+    "lodash": "^3.10.0",
+    "q": "^1.4.1"
+  },
+  "gitHead": "3827b19d8e8b724d27cf0420930fb8165d1fd241",
+  "bugs": {
+    "url": "https://github.com/Objectway/json-rest-server/issues"
+  },
+  "homepage": "https://github.com/Objectway/json-rest-server#readme",
+  "_id": "json-rest-server@1.0.2",
+  "_shasum": "0ac7d511a2bc58368461188a52a7bef4a45025f1",
+  "_from": "json-rest-server@*",
+  "_npmVersion": "2.12.1",
+  "_nodeVersion": "0.12.2",
+  "_npmUser": {
+    "name": "micheledisalvatore",
+    "email": "npm@micheledisalvatore.it"
+  },
+  "dist": {
+    "shasum": "0ac7d511a2bc58368461188a52a7bef4a45025f1",
+    "tarball": "http://registry.npmjs.org/json-rest-server/-/json-rest-server-1.0.2.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "micheledisalvatore",
+      "email": "npm@micheledisalvatore.it"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/json-rest-server/-/json-rest-server-1.0.2.tgz"
 }
