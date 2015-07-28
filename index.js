@@ -194,13 +194,16 @@ module.exports = function (entryPoint) {
 
   });
 
-  try {
-    server.listen(serverPort, serverDomain);
-    console.log('\nServer running at '.grey + serverUrl.cyan);
-  } catch (err) {
-  }
+  function jrsStartServer() {
+    try {
+      server.listen(serverPort, serverDomain);
+      console.log('\nServer running at '.grey + serverUrl.cyan);
+    } catch (err) {
+    }
 
-  server.on('error', function () {
-    console.error('\nServer closed on error.'.red);
-  });
+    server.on('error', function () {
+      console.error('\nServer closed on error.'.red);
+    });
+  }
+  return jrsStartServer;
 };
