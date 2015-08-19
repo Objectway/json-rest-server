@@ -38,7 +38,7 @@ Set a different port to the default 3000
 $ json-rest-server myapi -P 3001
 ```
 
-### --allowCORS (-P)
+### --allowCORS (-C)
 Enable cross-origin resource sharing (CORS), default is disabled
 ```bash
 $ json-rest-server myapi -C
