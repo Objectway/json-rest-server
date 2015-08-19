@@ -25,6 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
+    "command-line-args": "^1.0.0",
     "lodash": "^3.10.0",
     "q": "^1.4.1"
   },

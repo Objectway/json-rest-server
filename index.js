@@ -1,4 +1,4 @@
-module.exports = function (entryPoint) {
+module.exports = function (entryPoint, serverPort, ALLOW_CORS) {
   var fs = require('fs')
     , http = require('http')
     , path = require('path')
@@ -8,19 +8,23 @@ module.exports = function (entryPoint) {
     , functions = require('./functions')
     ;
 
-  var serverPort = 3000
-    , serverDomain = '127.0.0.1'
+  var serverDomain = '127.0.0.1'
     , serverUrl = 'http://' + serverDomain + ':' + serverPort
     , fileExtension = '.json'
     , server
     ;
-
 
   var reply = function (request, response, status, header, content, filePath) {
     if (!response.finished) {
       response.writeHead(status, header);
       if (content) {
         response.write(content.toString());
+      }
+      if(ALLOW_CORS){
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Request-Method', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+        res.setHeader('Access-Control-Allow-Headers', '*');
       }
       response.end();
       console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + (status > 299 ? status.toString().red : status.toString().green) + (filePath ? ' -> ' + filePath.cyan : ''));
@@ -198,6 +202,8 @@ module.exports = function (entryPoint) {
     try {
       server.listen(serverPort, serverDomain);
       console.log('\nServer running at '.grey + serverUrl.cyan);
+      console.log('\nServing directory '.grey + path.resolve(entryPoint).toString().cyan);
+      console.log('\nCORS enabled: '.grey + ALLOW_CORS.toString().cyan);
     } catch (err) {
     }
 

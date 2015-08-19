@@ -24,12 +24,25 @@ myapi
 Start your server
 
 ```bash
-$ json-rest-server myapi
+$ json-rest-server myapi -P 3000 -C
 ```
 
 Now if you go to [http://localhost:3000/blog/posts/1](), you'll get the content of 1.json inside posts
 
 But if you go to [http://localhost:3000/blog/posts/1/comments](), you'll get an array with the content of all json files that are in the comments folder
+
+## Options
+### --port (-P) <number>
+Set a different port to the default 3000
+```bash
+$ json-rest-server myapi -P 3001
+```
+
+### --allowCORS (-P)
+Enable cross-origin resource sharing (CORS), default is disabled
+```bash
+$ json-rest-server myapi -C
+```
 
 ## Routes
 Like REST, you can have GET and POST on folders and GET, PUT and DELETE on json files. Based on previous example, you can have
