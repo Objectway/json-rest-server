@@ -2,7 +2,7 @@
   "name": "json-rest-server",
   "version": "1.2.0",
   "description": "An API server that reads a specific folder, takes all json files and exposes all of them via API",
-  "main": "index.js",
+  "main": "main.js",
   "bin": {
     "json-rest-server": "./main.js"
   },

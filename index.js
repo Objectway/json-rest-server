@@ -14,17 +14,18 @@ module.exports = function (entryPoint, serverPort, ALLOW_CORS) {
     , server
     ;
 
-  var reply = function (request, response, status, header, content, filePath) {
+  var reply = function (request, response, status, headers, content, filePath) {
     if (!response.finished) {
-      response.writeHead(status, header);
+      if(ALLOW_CORS) {
+        headers["Access-Control-Allow-Origin"] = "*";
+        headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept";
+        headers['Access-Control-Request-Method'] = '*';
+        headers['Access-Control-Allow-Methods'] = '*';
+        headers['Access-Control-Allow-Headers'] = '*';
+      }
+      response.writeHead(status, headers);
       if (content) {
         response.write(content.toString());
-      }
-      if(ALLOW_CORS){
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Request-Method', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-        res.setHeader('Access-Control-Allow-Headers', '*');
       }
       response.end();
       console.log(" -> " + request.method + " " + serverUrl + request.url + ' ' + (status > 299 ? status.toString().red : status.toString().green) + (filePath ? ' -> ' + filePath.cyan : ''));
@@ -207,8 +208,8 @@ module.exports = function (entryPoint, serverPort, ALLOW_CORS) {
     } catch (err) {
     }
 
-    server.on('error', function () {
-      console.error('\nServer closed on error.'.red);
+    server.on('error', function (error) {
+      console.error('\nServer closed on error.'.red, error);
     });
   }
   return jrsStartServer;
