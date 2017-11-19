@@ -29,9 +29,9 @@ exports.readDir = function(dirPath, fileExtension){
       deferred.reject(new Error(dirPath + ': ' + error));
     } else {
       filesList = filesList.filter(function(file){
-        if(path.extname(file) == fileExtension) {
-          return dirPath + '/' + file;
-        }
+        return path.extname(file) == fileExtension;
+      }).map(function(file){
+        return dirPath + '/' + file;
       });
       deferred.resolve(filesList);
     }
