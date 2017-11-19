@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 var commandLineArgs = require("command-line-args")
-  , colors = require('colors')
-  , cli = commandLineArgs([
-    { name: "port", alias: "P", type: Number, defaultValue: 3000 },
-    { name: "allowCORS", alias: "C", type: Boolean, defaultValue: false },
-    { name: "help", alias: "H", type: Boolean, defaultValue: false }
-  ])
-  , directory = process.argv[2] || "."
-  , usage = cli.getUsage()
-  , options = cli.parse()
+, colors = require('colors')
+, options = commandLineArgs([
+  { name: "port", alias: "P", type: Number, defaultValue: 3000 },
+  { name: "allowCORS", alias: "C", type: Boolean, defaultValue: false },
+  { name: "help", alias: "H", type: Boolean, defaultValue: false }
+])
+, directory = process.argv[2] || "."
+, commandLineUsage = require('command-line-usage')
+, usage = commandLineUsage(/*templateData*/)
   ;
 
 if(options.help){
